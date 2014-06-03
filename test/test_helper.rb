@@ -1,12 +1,12 @@
-ENV['RAILS_ENV'] ||= 'test'
+require 'minitest/autorun'
+require 'minitest/reporters'
 require 'pathname'
 require 'active_record'
 require 'active_support'
 require 'database_cleaner'
 require 'soft_delete_rails'
-require 'test/unit'
 require 'shoulda'
-require 'turn/autorun'
+Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
 module Rails
   def self.env

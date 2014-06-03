@@ -1,6 +1,7 @@
 # Soft Delete Rails
 
 Soft deletion for rails. Includes default scoping and skipping validations. Features soft deletion of dependent records as well as reviving of dependent records.
+Supports ActiveRecord >= 4.1.0
 
 ## Installation
 
@@ -34,7 +35,7 @@ Default scope (optional)
     where(deleted_at: nil)
 Deleted scope (non-optional)
 
-    where('deleted_at IS NOT NULL').unscoped
+    unscope(where: :deleted_at).where.not(deleted_at: nil)
 
 ## Options    
 Default usage includes the default scope and running model validations

@@ -4,7 +4,9 @@ source 'https://rubygems.org'
 gemspec
 
 group :test do
-  gem 'activesupport', '4.0.0'
+  gem 'activesupport', '4.1.0'
+  gem 'minitest'
+  gem 'minitest-reporters'
   gem 'sqlite3'
   gem 'database_cleaner'
   gem 'shoulda'
