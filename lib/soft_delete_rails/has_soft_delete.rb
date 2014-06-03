@@ -23,6 +23,7 @@ module SoftDeleteRails
         if force == :force
           if super()
             hard_destroy_dependent_records
+            return !self.persisted?
           end
         else
           run_callbacks(:destroy) do
