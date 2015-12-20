@@ -17,7 +17,7 @@ Or install it yourself as:
 
     $ gem install soft_delete_rails
 
-## Requierments
+## Requirements
 Datetime column deleted_at
     
     class CreateUsers < ActiveRecord::Migration
