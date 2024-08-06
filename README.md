@@ -19,7 +19,7 @@ Or install it yourself as:
 
 ## Requirements
 Datetime column deleted_at
-    
+
     class CreateUsers < ActiveRecord::Migration
       def up
         create_table :users, do |t|
@@ -37,19 +37,19 @@ Deleted scope (non-optional)
 
     unscope(where: :deleted_at).where.not(deleted_at: nil)
 
-## Options    
+## Options
 Default usage includes the default scope and running model validations
 
     class User < ActiveRecord::Base
       has_soft_delete
     end
-    
+
 Without default scope
-    
+
     class User < ActiveRecord::Base
       has_soft_delete default_scope: false
     end
-    
+
 Without validations. Will not run the model validations on soft delete or revive
 
     class User < ActiveRecord::Base
@@ -57,11 +57,11 @@ Without validations. Will not run the model validations on soft delete or revive
     end
 
 Without default scope and validations
-    
+
     class User < ActiveRecord::Base
       has_soft_delete default_scope: false, validate: false
     end
-        
+
 ## Dependent
 Requires both models to have has_soft_delete and deleted_at column
 
@@ -69,13 +69,13 @@ Requires both models to have has_soft_delete and deleted_at column
       belongs_to :group
       has_soft_delete
     end
-    
+
     # Will soft delete and revive the user records
     class Group < ActiveRecord::Base
       has_many :users, dependent: :destroy
       has_soft_delete
     end
-    
+
 ## Destroy
 
     group = Group.last
@@ -85,7 +85,7 @@ Requires both models to have has_soft_delete and deleted_at column
 
     # Will hard delete the record from the database and any dependent records
     group.destroy(:force)
-   
+
 
 ## Revive
 
@@ -96,8 +96,8 @@ Requires both models to have has_soft_delete and deleted_at column
 
 
 ## Author
-Andrew Medeiros, amedeiros0920@gmail.com, @_AndrewMedeiros
-    
+Andrew Medeiros, andrew@amedeiros.com, @_AndrewMedeiros
+
 ## Contributing
 
 1. Fork it ( https://github.com/amedeiros/soft_delete_rails/fork )

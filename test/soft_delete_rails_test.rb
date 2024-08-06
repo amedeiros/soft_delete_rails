@@ -15,7 +15,7 @@ class SoftDeleteRailsTest < ActiveSupport::TestCase
       should 'should set the deleted_at' do
         user = User.create
         assert_difference 'User.count', -1 do
-          user.destroy
+          user.discard
           assert user.deleted_at.present?
           assert user.soft_deleted?
         end
@@ -29,19 +29,19 @@ class SoftDeleteRailsTest < ActiveSupport::TestCase
 
         should 'soft delete dependent records' do
           assert_difference ['Group.count', 'User.count'], -1 do
-            assert @group.destroy
+            assert @group.discard
             assert @group.soft_deleted?
             assert @user.reload.soft_deleted?
           end
         end
 
-        should 'not soft destroy other non related records' do
+        should 'not soft discard other non related records' do
           # The scoping should not delete these records
           group1 = Group.create(name: 'testing')
           user1  = User.create(group: group1)
 
           assert_difference ['Group.count', 'User.count'], -1 do
-            assert @group.destroy
+            assert @group.discard
             assert @group.soft_deleted?
             assert @user.reload.soft_deleted?
             refute group1.reload.soft_deleted?
@@ -52,7 +52,7 @@ class SoftDeleteRailsTest < ActiveSupport::TestCase
         should 'hard delete a dependent record that does not have has_soft_delete' do
           PhoneNumber.create(user: @user)
           assert_difference ['User.count', 'PhoneNumber.count'], -1 do
-            assert @user.destroy
+            assert @user.discard
           end
         end
 
@@ -61,7 +61,7 @@ class SoftDeleteRailsTest < ActiveSupport::TestCase
             # A User has one address
             address = Address.create(user: @user)
             assert_difference ['User.count', 'Address.count'], -1 do
-              assert @user.destroy
+              assert @user.discard
               assert address.reload.soft_deleted?
             end
           end
@@ -72,8 +72,8 @@ class SoftDeleteRailsTest < ActiveSupport::TestCase
     context 'revive' do
       should 'revive a record' do
         user = User.create
-        # Soft destroy the record
-        assert user.destroy
+        # Soft discard the record
+        assert user.discard
         assert user.soft_deleted?
 
         # Revive the record
@@ -110,7 +110,7 @@ class SoftDeleteRailsTest < ActiveSupport::TestCase
         context 'has_one' do
           should 'revive a has_one relation' do
             address = Address.create(user: @user)
-            assert @user.destroy
+            assert @user.discard
             assert address.reload.soft_deleted?
 
             # Revive the user
@@ -126,7 +126,7 @@ class SoftDeleteRailsTest < ActiveSupport::TestCase
       should 'hard delete a record' do
         user = User.create
         assert_difference 'User.unscoped.count', -1 do
-          assert user.destroy(:force)
+          assert user.discard!
         end
       end
 
@@ -138,15 +138,15 @@ class SoftDeleteRailsTest < ActiveSupport::TestCase
 
         should 'hard delete dependent records' do
           assert_difference ['Group.unscoped.count', 'User.unscoped.count'], -1 do
-            assert @group.destroy(:force)
+            assert @group.discard!
           end
         end
 
         should 'hard delete dependent records that have been soft deleted' do
-          @user.destroy
+          @user.discard
           assert @user.soft_deleted?
           assert_difference ['Group.unscoped.count', 'User.unscoped.count'], -1 do
-            assert @group.destroy(:force)
+            assert @group.discard!
           end
         end
 
@@ -156,7 +156,7 @@ class SoftDeleteRailsTest < ActiveSupport::TestCase
           user  = User.create(group: group)
 
           assert_difference ['Group.count', 'User.count'], -1 do
-            assert @group.destroy(:force)
+            assert @group.discard!
             refute group.reload.soft_deleted?
             refute user.reload.soft_deleted?
           end
@@ -165,7 +165,7 @@ class SoftDeleteRailsTest < ActiveSupport::TestCase
         should 'hard delete a dependent record that does not have has_soft_delete' do
           PhoneNumber.create(user: @user)
           assert_difference ['User.count', 'PhoneNumber.count'], -1 do
-            assert @user.destroy
+            assert @user.discard
           end
         end
 
@@ -174,7 +174,7 @@ class SoftDeleteRailsTest < ActiveSupport::TestCase
             # A User has one address
             Address.create(user: @user)
             assert_difference ['User.unscoped.count', 'Address.unscoped.count'], -1 do
-              assert @user.destroy(:force)
+              assert @user.discard!
             end
           end
         end
@@ -204,7 +204,7 @@ class SoftDeleteRailsTest < ActiveSupport::TestCase
         group = Group.create(name: 'test')
         error = assert_raises ActiveRecord::RecordInvalid do
           group.name = nil
-          group.destroy
+          group.discard
         end
         assert_equal 'Validation failed: Name can\'t be blank', error.message, error.message.inspect
       end
@@ -213,7 +213,7 @@ class SoftDeleteRailsTest < ActiveSupport::TestCase
         account = Account.create(name: 'test')
         assert_nothing_raised do
           account.name = nil
-          assert account.destroy
+          assert account.discard
         end
       end
     end

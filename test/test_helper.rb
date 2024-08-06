@@ -6,6 +6,7 @@ require 'active_support'
 require 'database_cleaner'
 require 'soft_delete_rails'
 require 'shoulda'
+require 'byebug'
 Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
 module Rails

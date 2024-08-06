@@ -19,18 +19,34 @@ module SoftDeleteRails
     end
 
     module InstanceMethods
-      def destroy(force=nil)
-        if force == :force
-          if super()
-            hard_destroy_dependent_records
-            return !self.persisted?
-          end
-        else
-          run_callbacks(:destroy) do
-            soft_deleted? || new_record? ? save : update_deleted_at(Time.current)
-          end
+      def soft_delete
+        run_callbacks(:destroy) do
+          soft_deleted? || new_record? ? save : update_deleted_at(Time.current)
         end
       end
+      alias discard soft_delete
+
+      def soft_delete!
+        destroy
+        hard_destroy_dependent_records
+        !self.persisted
+      end
+      alias discard! soft_delete!
+      # def destroy(force: false)
+      #   if force
+      #     if super()
+      #       hard_destroy_dependent_records
+      #       return !self.persisted?
+      #     else
+      #       byebug
+      #       raise "Failed to hard delete"
+      #     end
+      #   else
+      #     run_callbacks(:destroy) do
+      #       soft_deleted? || new_record? ? save : update_deleted_at(Time.current)
+      #     end
+      #   end
+      # end
 
       def revive
         if soft_deleted?
@@ -39,10 +55,12 @@ module SoftDeleteRails
           return self.reload # return self reloaded
         end
       end
+      alias undiscard revive
 
       def soft_deleted?
         deleted_at.present?
       end
+      alias discarded? soft_deleted?
 
       private
 
@@ -69,6 +87,7 @@ module SoftDeleteRails
 
       # Perform a hard destroy on the dependent records
       def hard_destroy_dependent_records
+        byebug
         reflections.each do |key, relation|
           if relation.options[:dependent] == :destroy
             records = send(key).try(:unscope, where: :deleted_at) if key.to_s.singularize.camelize.constantize.column_names.include?('deleted_at')
